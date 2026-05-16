@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aero ERP — Prototyp</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2333;
+    --border: #2a3045;
+    --border2: #3a4560;
+    --accent: #4f8ef7;
+    --accent2: #2d5fd4;
+    --accent-dim: rgba(79,142,247,0.12);
+    --green: #3ecf8e;
+    --green-dim: rgba(62,207,142,0.12);
+    --yellow: #f5c542;
+    --yellow-dim: rgba(245,197,66,0.12);
+    --red: #f56565;
+    --red-dim: rgba(245,101,101,0.12);
+    --text: #e2e8f0;
+    --text2: #8892a4;
+    --text3: #4a5568;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+
+  /* LAYOUT */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+  .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* SIDEBAR */
+  .logo { padding: 20px 16px 16px; border-bottom: 1px solid var(--border); }
+  .logo-mark { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--accent); letter-spacing: -1px; }
+  .logo-sub { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+  .nav { padding: 12px 8px; flex: 1; }
+  .nav-section { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; padding: 12px 8px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; color: var(--text2); transition: all .15s; font-size: 13px; margin-bottom: 2px; }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent-dim); color: var(--accent); }
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-family: var(--mono); padding: 1px 6px; border-radius: 10px; }
+  .sidebar-footer { padding: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text3); }
+
+  /* TOPBAR */
+  .topbar { height: 52px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; background: var(--surface); flex-shrink: 0; }
+  .topbar-title { font-size: 15px; font-weight: 500; }
+  .topbar-crumb { color: var(--text3); font-size: 13px; }
+  .topbar-sep { color: var(--text3); }
+  .topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-family: var(--sans); cursor: pointer; border: none; transition: all .15s; font-weight: 500; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+  .btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(245,101,101,0.3); }
+  .btn-success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* TABLE */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
+  .table-header-title { font-weight: 500; font-size: 14px; }
+  .search-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; color: var(--text); font-size: 13px; font-family: var(--sans); width: 220px; }
+  .search-box:focus { outline: none; border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text3); }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { border-bottom: 1px solid var(--border); }
+  th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 500; color: var(--text3); letter-spacing: .5px; text-transform: uppercase; white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { cursor: pointer; transition: background .1s; }
+  tbody tr:hover td { background: var(--surface2); color: var(--text); }
+  td.bold { color: var(--text); font-weight: 500; }
+  td.mono { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+  /* BADGE */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; font-family: var(--mono); }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .badge-new { background: var(--accent-dim); color: var(--accent); }
+  .badge-sent { background: var(--yellow-dim); color: var(--yellow); }
+  .badge-accepted { background: var(--green-dim); color: var(--green); }
+  .badge-rejected { background: var(--red-dim); color: var(--red); }
+
+  /* DETAIL LAYOUT */
+  .detail-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-weight: 500; font-size: 14px; }
+  .card-body { padding: 18px; }
+
+  /* FORM */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-single { margin-bottom: 14px; }
+  label { display: block; font-size: 11px; color: var(--text3); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 5px; font-weight: 500; }
+  .input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 13px; font-family: var(--sans); transition: border-color .15s; }
+  .input:focus { outline: none; border-color: var(--accent); }
+  .input::placeholder { color: var(--text3); }
+  select.input { cursor: pointer; }
+  textarea.input { resize: vertical; min-height: 80px; }
+
+  /* SIDE PANEL */
+  .side-panel { display: flex; flex-direction: column; gap: 16px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 12px; color: var(--text3); }
+  .info-value { font-size: 13px; font-weight: 500; }
+  .info-value.accent { color: var(--accent); font-family: var(--mono); }
+  .info-value.green { color: var(--green); font-family: var(--mono); }
+
+  /* COST TABLE */
+  .cost-table-wrap { overflow-x: auto; }
+  .cost-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .cost-table th { padding: 8px 10px; text-align: left; font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; background: var(--bg); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .cost-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: middle; }
+  .cost-table tbody tr:hover td { background: var(--surface2); }
+  .cost-table td input { background: transparent; border: none; color: var(--text); font-family: var(--sans); font-size: 12px; width: 100%; }
+  .cost-table td input:focus { outline: none; background: var(--bg); border-radius: 4px; padding: 2px 4px; }
+  .supplier-cell { display: flex; gap: 6px; align-items: center; }
+  .supplier-best { color: var(--green); font-weight: 600; }
+  .col-supplier { min-width: 130px; }
+  .col-price { min-width: 80px; text-align: right; }
+  .col-final { min-width: 110px; }
+  .add-row-btn { display: flex; align-items: center; gap: 6px; padding: 10px; color: var(--text3); font-size: 12px; cursor: pointer; transition: color .15s; border-top: 1px dashed var(--border); }
+  .add-row-btn:hover { color: var(--accent); }
+
+  /* FOLDER LINK */
+  .folder-link { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text2); cursor: pointer; font-size: 13px; transition: all .15s; font-family: var(--mono); font-size: 11px; }
+  .folder-link:hover { border-color: var(--accent); color: var(--accent); }
+  .folder-link svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab { padding: 10px 18px; font-size: 13px; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 100; display: none; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 680px; max-height: 85vh; overflow-y: auto; }
+  .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 4px; }
+  .modal-close:hover { background: var(--surface2); color: var(--text); }
+  .modal-body { padding: 22px; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* OFFER PREVIEW */
+  .offer-preview { background: #fff; color: #111; border-radius: 6px; padding: 32px 36px; font-family: var(--sans); }
+  .offer-preview h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: #111; }
+  .offer-preview .offer-number { font-family: var(--mono); font-size: 12px; color: #666; margin-bottom: 24px; }
+  .offer-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; font-size: 13px; }
+  .offer-meta-label { color: #888; font-size: 11px; }
+  .offer-meta-value { font-weight: 500; }
+  .offer-total-box { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0; }
+  .offer-total-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .offer-total-value { font-size: 32px; font-weight: 700; color: #1a1a2e; margin-top: 6px; }
+  .offer-notes { margin-top: 20px; font-size: 13px; color: #444; line-height: 1.7; white-space: pre-wrap; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+  .offer-footer { margin-top: 28px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; padding-top: 14px; }
+
+  /* GUIDES */
+  .guide-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; }
+  .guide-card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .guide-steps { padding: 0 16px 14px; border-top: 1px solid var(--border); }
+  .guide-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .guide-step:last-child { border-bottom: none; }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-family: var(--mono); color: var(--text3); flex-shrink: 0; }
+  .step-role { font-weight: 500; font-size: 13px; min-width: 120px; }
+  .step-desc { font-size: 12px; color: var(--text3); }
+  .step-sign { margin-left: auto; font-size: 11px; color: var(--text3); border: 1px dashed var(--border2); padding: 3px 10px; border-radius: 4px; }
+
+  /* SUMMARY ROW */
+  .summary-row { display: flex; align-items: center; justify-content: flex-end; gap: 24px; padding: 12px 16px; background: var(--bg); border-top: 1px solid var(--border); }
+  .summary-item { text-align: right; }
+  .summary-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+  .summary-value { font-size: 15px; font-weight: 600; font-family: var(--mono); }
+  .summary-value.green { color: var(--green); }
+  .summary-value.accent { color: var(--accent); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--green); border-radius: 8px; padding: 12px 18px; color: var(--green); font-size: 13px; display: flex; align-items: center; gap: 8px; z-index: 200; transform: translateY(80px); opacity: 0; transition: all .3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* EMPTY */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-state svg { width: 40px; height: 40px; margin: 0 auto 12px; opacity: .3; display: block; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+  .section-title { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; margin-bottom: 12px; }
+
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--surface2); color: var(--text2); }
+
+  .margin-input-wrap { display: flex; align-items: center; gap: 6px; }
+  .margin-input-wrap .input { width: 70px; text-align: right; }
+
+  .highlight-row td { background: rgba(62,207,142,0.06) !important; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">AERO</div>
+      <div class="logo-sub">ERP System</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Główne</div>
+      <div class="nav-item active" onclick="goto('inquiries')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        Zapytania
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" onclick="goto('orders')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14l2 2 4-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        Zlecenia
+      </div>
+      <div class="nav-section">Słowniki</div>
+      <div class="nav-item" onclick="goto('clients')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Klienci
+      </div>
+      <div class="nav-item" onclick="goto('contractors')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Kontrahenci
+      </div>
+      <div class="nav-item" onclick="goto('guides-tpl')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8"/></svg>
+        Szablony przewodników
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      Zalogowany: Anna Kowalska
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: INQUIRIES LIST -->
+    <div id="screen-inquiries" class="screen active">
+      <div class="topbar">
+        <span class="topbar-title">Zapytania ofertowe</span>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" onclick="openModal('modal-new-inquiry')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+            Nowe zapytanie
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="table-wrap" style="overflow-x:auto">
+          <div class="table-header">
+            <span class="table-header-title">Wszystkie zapytania</span>
+            <input class="search-box" placeholder="Szukaj: klient, numer..." />
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm">Wszystkie</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--accent)">Nowe</button>
+              <button class="btn btn-ghost btn-sm">Wysłane</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:32px">L.P.</th>
+                <th>Numer oferty</th>
+                <th>Klient</th>
+                <th>Wystawiamy jako</th>
+                <th>Typ zapytania</th>
+                <th>Nazwa zapytania</th>
+                <th>Opis</th>
+                <th>Status</th>
+                <th>Koordynator</th>
+                <th>Data zapytania</th>
+                <th style="white-space:nowrap">Dead Line</th>
+                <th>Data wysłania</th>
+                <th>Komentarz</th>
+                <th>Nr AS</th>
+                <th>Folder</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="goto('inquiry-detail')">
+                <td style="color:var(--text3);font-family:var(--mono);font-size:11px">1</td>
+                <td class="mono">OFERTA2-05-2026</td>
+                <td class="bold">Klient Przykładowy sp. z o.o.</td>
+                <td><span class="chip">ZOO</span></td>
+                <td><span class="chip">Produkcja</span></td>
+                <td class="bold">Spawanie ramy nośnej Q2</td>
+                <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3);font-size:12px">Rama stalowa, 3 szt., stal S355</td>
+                <td><span class="badge badge-new">Nowe</span></td>
+                <td>Anna Kowalska</td>
+                <td>2026-05-07</td>
+                <td style="color:var(--yellow);font-family:var(--mono);font-size:12px">2026-06-30</td>
+                <td style="color:var(--text3);font-size:12px">—</td>
+                <td style="color:var(--text3);font-size:12px">—</td>
+                <td style="color:var(--text3);font-size:12px">—</td>
+                <td><span class="folder-link" onclick="event.stopPropagation();showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
+                <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
+              </tr>
+              <tr onclick="goto('inquiry-detail')">
+                <td style="color:var(--text3);font-family:var(--mono);font-size:11px">2</td>
+                <td class="mono">OFERTA1-05-2026</td>
+                <td class="bold">Firma Przykładowa A</td>
+                <td><span class="chip">JDG</span></td>
+                <td><span class="chip">Handel</span></td>
+                <td class="bold">Dostawa elementów złącznych</td>
+                <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3);font-size:12px">Śruby M12, nakrętki, podkładki</td>
+                <td><span class="badge badge-sent">Wysłane</span></td>
+                <td>Piotr Nowak</td>
+                <td>2026-05-02</td>
+                <td style="color:var(--yellow);font-family:var(--mono);font-size:12px">2026-05-20</td>
+                <td style="font-family:var(--mono);font-size:12px">2026-05-10</td>
+                <td style="color:var(--text3);font-size:12px;max-width:120px">Czekamy na odpowiedź</td>
+                <td style="color:var(--text3);font-size:12px">—</td>
+                <td><span class="folder-link" onclick="event.stopPropagation();showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
+                <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
+              </tr>
+              <tr>
+                <td style="color:var(--text3);font-family:var(--mono);font-size:11px">3</td>
+                <td class="mono">OFERTA3-04-2026</td>
+                <td class="bold">Firma Przykładowa B</td>
+                <td><span class="chip">ZOO</span></td>
+                <td><span class="chip">Spawalnia</span></td>
+                <td class="bold">Konstrukcja hali magazynowej</td>
+                <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3);font-size:12px">Stalowa, 400m², ocynk</td>
+                <td><span class="badge badge-accepted">Zaakceptowane</span></td>
+                <td>Anna Kowalska</td>
+                <td>2026-04-18</td>
+                <td style="font-family:var(--mono);font-size:12px">2026-07-31</td>
+                <td style="font-family:var(--mono);font-size:12px">2026-04-22</td>
+                <td style="color:var(--text3);font-size:12px">—</td>
+                <td class="mono" style="color:var(--green);font-size:12px">AS-2026-0042</td>
+                <td><span class="folder-link" onclick="showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
+                <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: INQUIRY DETAIL -->
+    <div id="screen-inquiry-detail" class="screen">
+      <div class="topbar">
+        <span class="topbar-crumb" onclick="goto('inquiries')" style="cursor:pointer">Zapytania</span>
+        <span class="topbar-sep">›</span>
+        <span class="topbar-title" style="font-family:var(--mono);color:var(--accent)">OFERTA2-05-2026</span>
+        <span style="margin-left:8px"><span class="badge badge-new">Nowe</span></span>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" onclick="showToast('Otwieranie folderu...')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg>
+            Otwórz folder
+          </button>
+          <button class="btn btn-success" onclick="openModal('modal-offer')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Stwórz ofertę
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="detail-grid">
+
+          <!-- LEFT: KOSZTORYS -->
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <span class="card-title">Dane zapytania</span>
+              </div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div>
+                    <label>Klient</label>
+                    <input class="input" value="Klient Przykładowy sp. z o.o." />
+                  </div>
+                  <div>
+                    <label>Koordynator</label>
+                    <input class="input" value="Anna Kowalska" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div>
+                    <label>Data wpłynięcia</label>
+                    <input class="input" type="date" value="2026-05-07" />
+                  </div>
+                  <div>
+                    <label>Dokumentacja własna</label>
+                    <select class="input">
+                      <option>Tak</option>
+                      <option selected>Nie</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Kosztorys szczegółowy</span>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="margin-input-wrap">
+                    <label style="margin:0;font-size:11px">Marża:</label>
+                    <input class="input" id="margin-input" value="20" oninput="recalc()" /> <span style="color:var(--text3);font-size:13px">%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="cost-table-wrap">
+                <table class="cost-table">
+                  <thead>
+                    <tr>
+                      <th>Proces</th>
+                      <th>Nr detalu</th>
+                      <th>Opis</th>
+                      <th>Ilość</th>
+                      <th class="col-supplier">Dostawca 1</th>
+                      <th class="col-price">Cena 1</th>
+                      <th class="col-supplier">Dostawca 2</th>
+                      <th class="col-price">Cena 2</th>
+                      <th class="col-final">Finalny dostawca</th>
+                      <th class="col-price">Cena szt.</th>
+                      <th class="col-price">Razem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input value="Spawanie" /></td>
+                      <td><input value="DET-001" /></td>
+                      <td><input value="Rama główna" /></td>
+                      <td><input value="2" style="width:40px;text-align:right" /></td>
+                      <td class="col-supplier"><input value="Firma A" /></td>
+                      <td class="col-price" style="color:var(--red)"><input value="4 200" style="text-align:right;color:var(--red)" /></td>
+                      <td class="col-supplier"><input value="Firma B" /></td>
+                      <td class="col-price" style="color:var(--green)"><input value="3 800" style="text-align:right;color:var(--green)" /></td>
+                      <td class="col-final"><select class="input" style="padding:3px 6px;font-size:11px"><option>Firma B</option><option>Firma A</option></select></td>
+                      <td class="col-price supplier-best">3 800</td>
+                      <td class="col-price supplier-best">7 600</td>
+                    </tr>
+                    <tr>
+                      <td><input value="Obróbka CNC" /></td>
+                      <td><input value="DET-002" /></td>
+                      <td><input value="Wał napędowy" /></td>
+                      <td><input value="5" style="width:40px;text-align:right" /></td>
+                      <td class="col-supplier"><input value="Dostawca CNC" /></td>
+                      <td class="col-price" style="color:var(--green)"><input value="1 200" style="text-align:right;color:var(--green)" /></td>
+                      <td class="col-supplier"><input value="Dostawca Metal" /></td>
+                      <td class="col-price" style="color:var(--red)"><input value="1 450" style="text-align:right;color:var(--red)" /></td>
+                      <td class="col-final"><select class="input" style="padding:3px 6px;font-size:11px"><option>Dostawca CNC</option><option>Dostawca Metal</option></select></td>
+                      <td class="col-price supplier-best">1 200</td>
+                      <td class="col-price supplier-best">6 000</td>
+                    </tr>
+                    <tr>
+                      <td><input value="Malowanie" /></td>
+                      <td><input value="DET-001,002" /></td>
+                      <td><input value="Zabezpieczenie antykorozyjne" /></td>
+                      <td><input value="1" style="width:40px;text-align:right" /></td>
+                      <td class="col-supplier"><input value="Dostawca Lakiernia" /></td>
+                      <td class="col-price" style="color:var(--green)"><input value="2 900" style="text-align:right;color:var(--green)" /></td>
+                      <td class="col-supplier"><input value="" /></td>
+                      <td class="col-price"><input value="—" style="text-align:right;color:var(--text3)" /></td>
+                      <td class="col-final"><select class="input" style="padding:3px 6px;font-size:11px"><option>Dostawca Lakiernia</option></select></td>
+                      <td class="col-price supplier-best">2 900</td>
+                      <td class="col-price supplier-best">2 900</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="add-row-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+                  Dodaj pozycję
+                </div>
+                <div class="summary-row">
+                  <div class="summary-item">
+                    <div class="summary-label">Koszt</div>
+                    <div class="summary-value" id="summary-cost">16 500 PLN</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-label" id="summary-margin-label">Marża 20%</div>
+                    <div class="summary-value green" id="summary-profit">3 300 PLN</div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-label">Cena ofertowa</div>
+                    <div class="summary-value accent" id="summary-offer">19 800 PLN</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: PANEL -->
+          <div class="side-panel">
+            <div class="card">
+              <div class="card-header"><span class="card-title">Podsumowanie</span></div>
+              <div class="card-body">
+                <div class="info-row"><span class="info-label">Numer</span><span class="info-value accent">OFERTA2-05-2026</span></div>
+                <div class="info-row"><span class="info-label">Koszt całkowity</span><span class="info-value" id="side-cost">16 500 PLN</span></div>
+                <div class="info-row"><span class="info-label">Marża</span><span class="info-value" id="side-margin">20%</span></div>
+                <div class="info-row"><span class="info-label">Zysk</span><span class="info-value green" id="side-profit">3 300 PLN</span></div>
+                <div class="info-row"><span class="info-label">Cena ofertowa</span><span class="info-value accent" id="side-offer">19 800 PLN</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Folder projektu</span></div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+                <div class="folder-link" onclick="showToast('Otwieranie folderu w Eksploratorze...')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg>
+                  \\serwer\OFERTY\2026\OFERTA2-05-2026
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <div class="folder-link" style="font-size:10px" onclick="showToast('Otwieranie podfolderu...')">📁 dok_techniczna</div>
+                  <div class="folder-link" style="font-size:10px" onclick="showToast('Otwieranie podfolderu...')">📁 kooperacja</div>
+                  <div class="folder-link" style="font-size:10px" onclick="showToast('Otwieranie podfolderu...')">📁 korespondencja</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Akcje</span></div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-success" style="width:100%;justify-content:center" onclick="openModal('modal-offer')">Stwórz ofertę dla klienta</button>
+                <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="goto('order-detail')">Przejdź do zlecenia</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: ORDERS LIST -->
+    <div id="screen-orders" class="screen">
+      <div class="topbar">
+        <span class="topbar-title">Zlecenia produkcyjne</span>
+        <div class="topbar-actions">
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+            Nowe zlecenie
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-header-title">Wszystkie zlecenia</span>
+            <input class="search-box" placeholder="Szukaj: klient, numer AS..." />
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Numer AS</th>
+                <th>Klient</th>
+                <th>Zapytanie</th>
+                <th>Data zlecenia</th>
+                <th>Termin</th>
+                <th>Wartość</th>
+                <th>Folder</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="goto('order-detail')">
+                <td class="mono">AS-2026-0042</td>
+                <td class="bold">Firma Przykładowa B</td>
+                <td class="mono" style="font-size:11px">OFERTA3-04-2026</td>
+                <td>2026-04-25</td>
+                <td>2026-06-15</td>
+                <td class="bold" style="color:var(--green);font-family:var(--mono)">61 200 PLN</td>
+                <td><span class="folder-link" onclick="event.stopPropagation();showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
+                <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: ORDER DETAIL -->
+    <div id="screen-order-detail" class="screen">
+      <div class="topbar">
+        <span class="topbar-crumb" onclick="goto('orders')" style="cursor:pointer">Zlecenia</span>
+        <span class="topbar-sep">›</span>
+        <span class="topbar-title" style="font-family:var(--mono);color:var(--accent)">AS-2026-0042</span>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" onclick="showToast('Otwieranie folderu zlecenia...')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg>
+            Otwórz folder
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'tab-items')">Pozycje zlecenia</div>
+          <div class="tab" onclick="switchTab(this,'tab-guides')">Przewodniki</div>
+        </div>
+
+        <div id="tab-items" class="tab-content">
+          <div class="detail-grid">
+            <div class="card">
+              <div class="card-header"><span class="card-title">Pozycje zlecenia (kopia z wyceny)</span></div>
+              <div class="cost-table-wrap">
+                <table class="cost-table">
+                  <thead>
+                    <tr>
+                      <th>Proces</th>
+                      <th>Nr detalu</th>
+                      <th>Opis</th>
+                      <th>Ilość</th>
+                      <th>Dostawca</th>
+                      <th class="col-price">Cena szt.</th>
+                      <th class="col-price">Razem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Spawanie</td>
+                      <td class="mono" style="font-size:11px">DET-001</td>
+                      <td>Rama główna</td>
+                      <td>2</td>
+                      <td>Firma B</td>
+                      <td class="col-price" style="font-family:var(--mono)">3 800</td>
+                      <td class="col-price supplier-best">7 600</td>
+                    </tr>
+                    <tr>
+                      <td>Obróbka CNC</td>
+                      <td class="mono" style="font-size:11px">DET-002</td>
+                      <td>Wał napędowy</td>
+                      <td>5</td>
+                      <td>Dostawca CNC</td>
+                      <td class="col-price" style="font-family:var(--mono)">1 200</td>
+                      <td class="col-price supplier-best">6 000</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="side-panel">
+              <div class="card">
+                <div class="card-header"><span class="card-title">Dane zlecenia</span></div>
+                <div class="card-body">
+                  <div class="info-row"><span class="info-label">Numer AS</span><span class="info-value accent">AS-2026-0042</span></div>
+                  <div class="info-row"><span class="info-label">Klient</span><span class="info-value">Firma Przykładowa B</span></div>
+                  <div class="info-row"><span class="info-label">Z zapytania</span><span class="info-value accent" style="font-size:11px">OFERTA3-04-2026</span></div>
+                  <div class="info-row"><span class="info-label">Termin</span><span class="info-value">2026-06-15</span></div>
+                  <div class="info-row"><span class="info-label">Wartość</span><span class="info-value green">61 200 PLN</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-guides" class="tab-content" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span class="section-title">Przewodniki produkcyjne</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-guide')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M12 5v14M5 12h14"/></svg>
+              Dodaj przewodnik
+            </button>
+          </div>
+          <div class="guide-card">
+            <div class="guide-card-header">
+              <div class="step-num" style="width:28px;height:28px;font-size:13px">1</div>
+              <div>
+                <div style="font-weight:500;font-size:13px">Spawanie konstrukcji stalowej</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">4 etapy · Wydrukowano: 2026-04-26</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="showToast('Drukowanie przewodnika...')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Drukuj
+              </button>
+            </div>
+            <div class="guide-steps">
+              <div class="guide-step">
+                <div class="step-num">1</div>
+                <div class="step-role">Magazynier</div>
+                <div class="step-desc">Wydanie materiałów wg listy</div>
+                <div class="step-sign">Podpis: ___________</div>
+              </div>
+              <div class="guide-step">
+                <div class="step-num">2</div>
+                <div class="step-role">Spawacz</div>
+                <div class="step-desc">Spawanie wg dokumentacji technicznej</div>
+                <div class="step-sign">Podpis: ___________</div>
+              </div>
+              <div class="guide-step">
+                <div class="step-num">3</div>
+                <div class="step-role">Szlifierz</div>
+                <div class="step-desc">Szlifowanie spoin, usunięcie odprysków</div>
+                <div class="step-sign">Podpis: ___________</div>
+              </div>
+              <div class="guide-step">
+                <div class="step-num">4</div>
+                <div class="step-role">Kontrola jakości</div>
+                <div class="step-desc">Kontrola wymiarowa i wizualna</div>
+                <div class="step-sign">Podpis: ___________</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: CLIENTS -->
+    <div id="screen-clients" class="screen">
+      <div class="topbar"><span class="topbar-title">Klienci</span><div class="topbar-actions"><button class="btn btn-primary">+ Nowy klient</button></div></div>
+      <div class="content">
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-header-title">Baza klientów</span><input class="search-box" placeholder="Szukaj..." /></div>
+          <table>
+            <thead><tr><th>Nazwa</th><th>NIP</th><th>Typ</th><th>Email</th><th>Telefon</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="bold">Klient Przykładowy sp. z o.o.</td><td class="mono">123-456-78-90</td><td><span class="chip">ZOO</span></td><td>kontakt@klient.pl</td><td>512 345 678</td><td><button class="btn btn-ghost btn-sm">Edytuj</button></td></tr>
+              <tr><td class="bold">Firma Przykładowa B</td><td class="mono">987-654-32-10</td><td><span class="chip">ZOO</span></td><td>info@firmab.pl</td><td>500 111 222</td><td><button class="btn btn-ghost btn-sm">Edytuj</button></td></tr>
+              <tr><td class="bold">Firma Przykładowa A</td><td class="mono">456-123-00-12</td><td><span class="chip">JDG</span></td><td>biuro@firmaa.pl</td><td>600 789 012</td><td><button class="btn btn-ghost btn-sm">Edytuj</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: CONTRACTORS -->
+    <div id="screen-contractors" class="screen">
+      <div class="topbar"><span class="topbar-title">Kontrahenci / Dostawcy</span><div class="topbar-actions"><button class="btn btn-primary">+ Nowy kontrahent</button></div></div>
+      <div class="content">
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-header-title">Baza kontrahentów</span><input class="search-box" placeholder="Szukaj..." /></div>
+          <table>
+            <thead><tr><th>Nazwa</th><th>NIP</th><th>Typ</th><th>Email</th><th>Telefon</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="bold">Dostawca CNC</td><td class="mono">111-222-33-44</td><td><span class="chip">ZOO</span></td><td>cnc@dostawca.pl</td><td>513 000 111</td><td><button class="btn btn-ghost btn-sm">Edytuj</button></td></tr>
+              <tr><td class="bold">Dostawca Lakiernia</td><td class="mono">555-666-77-88</td><td><span class="chip">JDG</span></td><td>lakier@dostawca.pl</td><td>604 222 333</td><td><button class="btn btn-ghost btn-sm">Edytuj</button></td></tr>
+              <tr><td class="bold">Dostawca Metal</td><td class="mono">333-444-55-66</td><td><span class="chip">ZOO</span></td><td>metal@dostawca.pl</td><td>501 444 555</td><td><button class="btn btn-ghost btn-sm">Edytuj</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: GUIDE TEMPLATES -->
+    <div id="screen-guides-tpl" class="screen">
+      <div class="topbar"><span class="topbar-title">Szablony przewodników</span><div class="topbar-actions"><button class="btn btn-primary">+ Nowy szablon</button></div></div>
+      <div class="content">
+        <div class="guide-card" style="margin-bottom:12px">
+          <div class="guide-card-header">
+            <div><div style="font-weight:500">Spawanie konstrukcji stalowej</div><div style="font-size:11px;color:var(--text3);margin-top:2px">4 etapy</div></div>
+            <button class="btn btn-ghost btn-sm" style="margin-left:auto">Edytuj</button>
+          </div>
+          <div class="guide-steps">
+            <div class="guide-step"><div class="step-num">1</div><div class="step-role">Magazynier</div><div class="step-desc">Wydanie materiałów wg listy</div></div>
+            <div class="guide-step"><div class="step-num">2</div><div class="step-role">Spawacz</div><div class="step-desc">Spawanie wg dokumentacji</div></div>
+            <div class="guide-step"><div class="step-num">3</div><div class="step-role">Szlifierz</div><div class="step-desc">Szlifowanie spoin</div></div>
+            <div class="guide-step"><div class="step-num">4</div><div class="step-role">Kontrola jakości</div><div class="step-desc">Kontrola wymiarowa i wizualna</div></div>
+          </div>
+        </div>
+        <div class="guide-card">
+          <div class="guide-card-header">
+            <div><div style="font-weight:500">Obróbka CNC</div><div style="font-size:11px;color:var(--text3);margin-top:2px">3 etapy</div></div>
+            <button class="btn btn-ghost btn-sm" style="margin-left:auto">Edytuj</button>
+          </div>
+          <div class="guide-steps">
+            <div class="guide-step"><div class="step-num">1</div><div class="step-role">Magazynier</div><div class="step-desc">Wydanie materiału surowego</div></div>
+            <div class="guide-step"><div class="step-num">2</div><div class="step-role">Operator CNC</div><div class="step-desc">Obróbka wg programu</div></div>
+            <div class="guide-step"><div class="step-num">3</div><div class="step-role">Kontrola jakości</div><div class="step-desc">Pomiar wymiarowy</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- ═══════════════════════════════════════════════════════ MODAL: NEW INQUIRY -->
+<div id="modal-new-inquiry" class="modal-overlay">
+  <div class="modal" style="width:560px">
+    <div class="modal-header">
+      <span class="modal-title">Nowe zapytanie ofertowe</span>
+      <button class="modal-close" onclick="closeModal('modal-new-inquiry')">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Numer przydzielony przez system -->
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--accent-dim);border:1px solid rgba(79,142,247,0.25);border-radius:6px;margin-bottom:18px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Numer przydzielony automatycznie</div>
+          <div style="font-family:var(--mono);font-size:16px;color:var(--accent);font-weight:600">OFERTA4-05-2026</div>
+        </div>
+      </div>
+
+      <!-- Nazwa zapytania -->
+      <div class="form-single">
+        <label>Nazwa zapytania</label>
+        <input class="input" placeholder="np. Spawanie ramy nośnej — partia Q2" />
+      </div>
+
+      <!-- Klient + typ firmy -->
+      <div class="form-row">
+        <div>
+          <label>Klient</label>
+          <select class="input">
+            <option>— wybierz klienta —</option>
+            <option>Klient Przykładowy sp. z o.o.</option>
+            <option>Firma Przykładowa B</option>
+            <option>Firma Przykładowa A</option>
+          </select>
+        </div>
+        <div>
+          <label>Wystawiamy jako</label>
+          <select class="input">
+            <option>— wybierz —</option>
+            <option>ZOO — sp. z o.o.</option>
+            <option>JDG — jednoosobowa działalność</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Koordynator + data -->
+      <div class="form-row">
+        <div>
+          <label>Koordynator</label>
+          <input class="input" value="Anna Kowalska" />
+        </div>
+        <div>
+          <label>Data wpłynięcia</label>
+          <input class="input" type="date" value="2026-05-16" />
+        </div>
+      </div>
+
+      <!-- Typ zapytania + deadline -->
+      <div class="form-row">
+        <div>
+          <label>Typ zapytania</label>
+          <select class="input">
+            <option>— wybierz —</option>
+            <option>Handel</option>
+            <option>Stałe</option>
+            <option>Produkcja</option>
+            <option>Biurowe</option>
+            <option>Spawalnia</option>
+            <option>Reklamacja</option>
+          </select>
+        </div>
+        <div>
+          <label>Dead Line</label>
+          <input class="input" type="date" />
+        </div>
+      </div>
+
+      <!-- Opis -->
+      <div class="form-single">
+        <label>Opis zapytania</label>
+        <textarea class="input" rows="3" placeholder="Krótki opis zakresu prac, materiałów, wymagań technicznych..."></textarea>
+      </div>
+
+      <!-- Dokumentacja własna -->
+      <div class="form-single" style="margin-bottom:16px">
+        <label>Dokumentacja własna wymagana</label>
+        <select class="input" style="max-width:200px"><option>Nie</option><option>Tak</option></select>
+      </div>
+
+      <!-- Info o folderze -->
+      <div style="padding:12px 14px;background:var(--green-dim);border:1px solid rgba(62,207,142,0.3);border-radius:6px;font-size:12px;color:var(--green);">
+        ✓ System automatycznie utworzy folder na dysku:<br>
+        <span style="font-family:var(--mono);margin-top:4px;display:block;font-size:11px">\\serwer\OFERTY\2026\OFERTA4-05-2026\</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">  └─ dok_techniczna\ &nbsp; kooperacja\ &nbsp; korespondencja\</span>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-inquiry')">Anuluj</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-new-inquiry');showToast('Zapytanie OFERTA4-05-2026 utworzone. Folder założony na dysku.')">Utwórz zapytanie</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MODAL: CREATE OFFER -->
+<div id="modal-offer" class="modal-overlay">
+  <div class="modal" style="width:740px">
+    <div class="modal-header">
+      <span class="modal-title">Oferta dla klienta — edycja przed wysłaniem</span>
+      <button class="modal-close" onclick="closeModal('modal-offer')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs" style="margin-top:-4px">
+        <div class="tab active" onclick="switchTab(this,'offer-tab-edit')">Edytuj</div>
+        <div class="tab" onclick="switchTab(this,'offer-tab-preview')">Podgląd PDF</div>
+      </div>
+
+      <div id="offer-tab-edit">
+        <div class="form-row">
+          <div>
+            <label>Numer oferty</label>
+            <input class="input" value="OFF-2026-0042" />
+          </div>
+          <div>
+            <label>Data ważności oferty</label>
+            <input class="input" type="date" value="2026-06-16" />
+          </div>
+        </div>
+        <div class="form-single">
+          <label>Cena łączna (bez VAT)</label>
+          <input class="input" value="19 800 PLN" style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green)" />
+        </div>
+        <div class="form-single">
+          <label>Uwagi / komentarz do oferty (widoczne dla klienta)</label>
+          <textarea class="input" rows="5" id="offer-notes" placeholder="np. Cena obejmuje materiały i robociznę. Termin realizacji: 6 tygodni od daty złożenia zamówienia. Oferta nie obejmuje transportu.">Cena obejmuje materiały oraz robociznę. Szacowany termin realizacji: 6 tygodni od daty potwierdzenia zamówienia.
+
+W przypadku pytań prosimy o kontakt telefoniczny lub mailowy.</textarea>
+        </div>
+        <div style="padding:12px;background:var(--surface2);border-radius:6px;font-size:12px;color:var(--text3)">
+          ℹ️ Klient zobaczy tylko łączną cenę i Twoje uwagi. Szczegóły kosztorysu (dostawcy, ceny jednostkowe) nie są widoczne w ofercie.
+        </div>
+      </div>
+
+      <div id="offer-tab-preview" style="display:none">
+        <div class="offer-preview">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">
+            <div>
+              <div style="font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Oferta handlowa</div>
+              <h2>Klient Przykładowy sp. z o.o.</h2>
+              <div class="offer-number">OFF-2026-0042 · wystawiona: 2026-05-16</div>
+            </div>
+            <div style="text-align:right;font-size:12px;color:#888">
+              <div style="font-weight:600;color:#111;font-size:14px">Nazwa Firmy</div>
+              <div>ul. Przykładowa 1</div>
+              <div>00-000 Miasto</div>
+              <div>NIP: 000-000-00-00</div>
+            </div>
+          </div>
+          <div class="offer-total-box">
+            <div class="offer-total-label">Łączna cena netto</div>
+            <div class="offer-total-value">19 800 PLN</div>
+            <div style="font-size:11px;color:#aaa;margin-top:6px">+ VAT 23% = 24 354 PLN brutto</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;margin-bottom:16px">
+            <div><div style="color:#888;font-size:11px">Oferta ważna do:</div><div style="font-weight:500">2026-06-16</div></div>
+            <div><div style="color:#888;font-size:11px">Numer zapytania:</div><div style="font-weight:500;font-family:monospace">OFERTA2-05-2026</div></div>
+          </div>
+          <div class="offer-notes" id="offer-preview-notes" contenteditable="true" style="outline:none;border:1.5px dashed #ccc;border-radius:4px;padding:10px;min-height:60px;cursor:text;" title="Kliknij żeby edytować">Cena obejmuje materiały oraz robociznę. Szacowany termin realizacji: 6 tygodni od daty potwierdzenia zamówienia.
+
+W przypadku pytań prosimy o kontakt telefoniczny lub mailowy.</div>
+          <div style="font-size:10px;color:#aaa;margin-top:4px;font-style:italic">✏️ Kliknij w tekst powyżej żeby edytować komentarz</div>
+          <div class="offer-footer">
+            Nazwa Firmy · ul. Przykładowa 1, 00-000 Miasto · kontakt@firma.pl · tel. 000 000 000
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-offer')">Anuluj</button>
+      <button class="btn btn-ghost" onclick="switchToPreview()">Podgląd →</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-offer');showToast('PDF wygenerowany. Zmieniono status na: Wysłane.')">Generuj PDF i wyślij</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MODAL: ADD GUIDE -->
+<div id="modal-add-guide" class="modal-overlay">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <span class="modal-title">Dodaj przewodnik do zlecenia</span>
+      <button class="modal-close" onclick="closeModal('modal-add-guide')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-single">
+        <label>Szablon przewodnika</label>
+        <select class="input">
+          <option>Spawanie konstrukcji stalowej (4 etapy)</option>
+          <option>Obróbka CNC (3 etapy)</option>
+        </select>
+      </div>
+      <div class="form-single">
+        <label>Nazwa własna (opcjonalna)</label>
+        <input class="input" placeholder="np. Przewodnik — wał napędowy DET-002" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-guide')">Anuluj</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-add-guide');showToast('Przewodnik dodany do zlecenia.')">Dodaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  <span id="toast-msg">Gotowe</span>
+</div>
+
+<script>
+const BASE_COST = 16500;
+
+function fmt(n) {
+  return n.toLocaleString('pl-PL') + ' PLN';
+}
+
+function recalc() {
+  const margin = parseFloat(document.getElementById('margin-input')?.value) || 0;
+  const profit = Math.round(BASE_COST * margin / 100);
+  const offer  = BASE_COST + profit;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  set('summary-cost',         fmt(BASE_COST));
+  set('summary-margin-label', `Marża ${margin}%`);
+  set('summary-profit',       fmt(profit));
+  set('summary-offer',        fmt(offer));
+  set('side-cost',            fmt(BASE_COST));
+  set('side-margin',          margin + '%');
+  set('side-profit',          fmt(profit));
+  set('side-offer',           fmt(offer));
+}
+
+const screens = {
+  'inquiries': 'screen-inquiries',
+  'inquiry-detail': 'screen-inquiry-detail',
+  'orders': 'screen-orders',
+  'order-detail': 'screen-order-detail',
+  'clients': 'screen-clients',
+  'contractors': 'screen-contractors',
+  'guides-tpl': 'screen-guides-tpl',
+};
+
+const navMap = {
+  'inquiries': 0, 'inquiry-detail': 0,
+  'orders': 1,    'order-detail': 1,
+  'clients': 2,
+  'contractors': 3,
+  'guides-tpl': 4,
+};
+
+function goto(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + screen);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((item, i) => {
+    item.classList.toggle('active', i === navMap[screen]);
+  });
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function switchTab(tab, contentId) {
+  const parent = tab.closest('.tabs');
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const wrap = tab.closest('.content, .modal-body');
+  if (!wrap) return;
+  wrap.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+  const target = document.getElementById(contentId);
+  if (target) target.style.display = 'block';
+}
+
+function switchToPreview() {
+  const editTab = document.getElementById('offer-tab-edit');
+  const notes = document.getElementById('offer-notes');
+  const preview = document.getElementById('offer-preview-notes');
+  // Przepisz tylko gdy podgląd nie był jeszcze edytowany ręcznie
+  if (editTab && editTab.style.display !== 'none' && notes && preview) {
+    if (!preview.dataset.edited) {
+      preview.textContent = notes.value;
+    }
+  }
+  preview.addEventListener('input', () => { preview.dataset.edited = '1'; }, { once: true });
+  const tab = document.querySelector('#modal-offer .tabs .tab:last-child');
+  switchTab(tab, 'offer-tab-preview');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  }
+});
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
