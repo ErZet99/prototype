@@ -214,6 +214,34 @@
   .margin-input-wrap .input { width: 70px; text-align: right; }
 
   .highlight-row td { background: rgba(62,207,142,0.06) !important; }
+
+  /* ASSEMBLY (PRZYRZĄDY) TABLE */
+  .asm-table td { vertical-align: middle; }
+  .asm-table td input { text-align: right; }
+  .asm-table td.asm-name-cell input { text-align: left; font-weight: 500; color: var(--text); }
+  .asm-table td input.asm-margin { width: 52px; text-align: right; color: var(--yellow); }
+  .calc-cell { font-family: var(--mono); font-size: 12px; text-align: right; white-space: nowrap; }
+  .calc-cost { background: var(--surface2); color: var(--text); border-radius: 4px; }
+  .calc-profit { color: var(--green); }
+  .calc-price { color: var(--accent); font-weight: 600; }
+  .det-toggle { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 11px; padding: 2px 5px; line-height: 1; transition: color .15s; }
+  .det-toggle:hover { color: var(--accent); }
+  .det-toggle.open { color: var(--accent); }
+
+  /* MARGIN PANEL */
+  .margin-panel { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+  .margin-panel-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .margin-panel-top label { margin: 0; }
+  .lock-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 4px; font-size: 11px; background: var(--yellow-dim); color: var(--yellow); margin-left: auto; }
+  .mz-totals { display: flex; gap: 32px; }
+  .mz-item { }
+  .mz-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+  .mz-value { font-size: 16px; font-weight: 600; font-family: var(--mono); margin-top: 2px; }
+
+  /* DETAIL SUB-TABLE */
+  .detail-row > td { padding: 0 !important; background: var(--bg); }
+  .detail-sub { padding: 12px 14px; border-top: 1px solid var(--border2); }
+  .detail-sub-title { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -232,9 +260,18 @@
         Zapytania
         <span class="nav-badge">3</span>
       </div>
+      <div class="nav-item" onclick="goto('offers')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h6M9 17h4"/></svg>
+        Oferty
+        <span class="nav-badge">1</span>
+      </div>
       <div class="nav-item" onclick="goto('orders')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14l2 2 4-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
         Zlecenia
+      </div>
+      <div class="nav-item" onclick="goto('crm')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        CRM
       </div>
       <div class="nav-section">Słowniki</div>
       <div class="nav-item" onclick="goto('clients')">
@@ -295,6 +332,7 @@
                 <th style="white-space:nowrap">Dead Line</th>
                 <th>Data wysłania</th>
                 <th>Komentarz</th>
+                <th>Wąskie gardło</th>
                 <th>Nr AS</th>
                 <th>Folder</th>
                 <th></th>
@@ -315,6 +353,7 @@
                 <td style="color:var(--yellow);font-family:var(--mono);font-size:12px">2026-06-30</td>
                 <td style="color:var(--text3);font-size:12px">—</td>
                 <td style="color:var(--text3);font-size:12px">—</td>
+                <td><input class="input" style="width:140px;padding:4px 8px;font-size:12px" value="Czeka na materiał" onclick="event.stopPropagation()" onblur="showToast('Zapisano: Wąskie gardło')" /></td>
                 <td style="color:var(--text3);font-size:12px">—</td>
                 <td><span class="folder-link" onclick="event.stopPropagation();showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
                 <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
@@ -333,6 +372,7 @@
                 <td style="color:var(--yellow);font-family:var(--mono);font-size:12px">2026-05-20</td>
                 <td style="font-family:var(--mono);font-size:12px">2026-05-10</td>
                 <td style="color:var(--text3);font-size:12px;max-width:120px">Czekamy na odpowiedź</td>
+                <td><input class="input" style="width:140px;padding:4px 8px;font-size:12px" value="Brak rysunku DXF" onclick="event.stopPropagation()" onblur="showToast('Zapisano: Wąskie gardło')" /></td>
                 <td style="color:var(--text3);font-size:12px">—</td>
                 <td><span class="folder-link" onclick="event.stopPropagation();showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
                 <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
@@ -351,6 +391,7 @@
                 <td style="font-family:var(--mono);font-size:12px">2026-07-31</td>
                 <td style="font-family:var(--mono);font-size:12px">2026-04-22</td>
                 <td style="color:var(--text3);font-size:12px">—</td>
+                <td><input class="input" style="width:140px;padding:4px 8px;font-size:12px" value="—" onclick="event.stopPropagation()" onblur="showToast('Zapisano: Wąskie gardło')" /></td>
                 <td class="mono" style="color:var(--green);font-size:12px">AS-2026-0042</td>
                 <td><span class="folder-link" onclick="showToast('Otwieranie folderu...')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg></span></td>
                 <td><button class="btn btn-ghost btn-sm">Otwórz</button></td>
@@ -380,166 +421,204 @@
         </div>
       </div>
       <div class="content">
-        <div class="detail-grid">
-
-          <!-- LEFT: KOSZTORYS -->
-          <div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-header">
-                <span class="card-title">Dane zapytania</span>
-              </div>
-              <div class="card-body">
-                <div class="form-row">
-                  <div>
-                    <label>Klient</label>
-                    <input class="input" value="Klient Przykładowy sp. z o.o." />
-                  </div>
-                  <div>
-                    <label>Koordynator</label>
-                    <input class="input" value="Anna Kowalska" />
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div>
-                    <label>Data wpłynięcia</label>
-                    <input class="input" type="date" value="2026-05-07" />
-                  </div>
-                  <div>
-                    <label>Dokumentacja własna</label>
-                    <select class="input">
-                      <option>Tak</option>
-                      <option selected>Nie</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+        <!-- DANE ZAPYTANIA -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <span class="card-title">Dane zapytania</span>
+            <div class="folder-link" style="font-size:11px" onclick="showToast('Otwieranie folderu w Eksploratorze...')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg>
+              \\serwer\OFERTY\2026\OFERTA2-05-2026
             </div>
+          </div>
+          <div class="card-body">
+            <div class="form-row-3">
+              <div><label>Klient</label><input class="input" value="Klient Przykładowy sp. z o.o." /></div>
+              <div><label>Nr zamówienia klienta</label><input class="input" placeholder="—" /></div>
+              <div><label>Koordynator</label><input class="input" value="Anna Kowalska" /></div>
+            </div>
+            <div class="form-row-3" style="margin-bottom:0">
+              <div><label>Data wpłynięcia</label><input class="input" type="date" value="2026-05-07" /></div>
+              <div><label>Dead Line</label><input class="input" type="date" value="2026-06-30" /></div>
+              <div><label>Dokumentacja własna</label><select class="input"><option>Tak</option><option selected>Nie</option></select></div>
+            </div>
+          </div>
+        </div>
 
-            <div class="card">
-              <div class="card-header">
-                <span class="card-title">Kosztorys szczegółowy</span>
-                <div style="display:flex;align-items:center;gap:12px">
-                  <div class="margin-input-wrap">
-                    <label style="margin:0;font-size:11px">Marża:</label>
-                    <input class="input" id="margin-input" value="20" oninput="recalc()" /> <span style="color:var(--text3);font-size:13px">%</span>
-                  </div>
-                </div>
+        <!-- ZAKŁADKI: KOSZTORYS / MARŻOWANIE -->
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'tab-kosztorys')">Kosztorys</div>
+          <div class="tab" onclick="switchTab(this,'tab-marzowanie')">🔒 Marżowanie</div>
+        </div>
+
+        <!-- TAB 1: KOSZTORYS -->
+        <div id="tab-kosztorys" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Przyrządy — pełne złożenia (bez rozbicia na detale)</span>
+            </div>
+            <div class="cost-table-wrap">
+              <table class="cost-table asm-table">
+                <thead>
+                  <tr>
+                    <th style="width:24px"></th>
+                    <th style="width:40px">Lp.</th>
+                    <th class="col-price" style="width:70px">Ilość</th>
+                    <th>Nazwa produktu</th>
+                    <th class="col-price">Kalkulacja</th>
+                    <th style="width:130px"></th>
+                  </tr>
+                </thead>
+                <tbody id="kosztorys-tbody"></tbody>
+              </table>
+              <div class="add-row-btn" onclick="addAssemblyRow()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+                Dodaj przyrząd
               </div>
-              <div class="cost-table-wrap">
-                <table class="cost-table">
-                  <thead>
-                    <tr>
-                      <th>Proces</th>
-                      <th>Nr detalu</th>
-                      <th>Opis</th>
-                      <th>Ilość</th>
-                      <th class="col-supplier">Dostawca 1</th>
-                      <th class="col-price">Cena 1</th>
-                      <th class="col-supplier">Dostawca 2</th>
-                      <th class="col-price">Cena 2</th>
-                      <th class="col-final">Finalny dostawca</th>
-                      <th class="col-price">Cena szt.</th>
-                      <th class="col-price">Razem</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input value="Spawanie" /></td>
-                      <td><input value="DET-001" /></td>
-                      <td><input value="Rama główna" /></td>
-                      <td><input value="2" style="width:40px;text-align:right" /></td>
-                      <td class="col-supplier"><input value="Firma A" /></td>
-                      <td class="col-price" style="color:var(--red)"><input value="4 200" style="text-align:right;color:var(--red)" /></td>
-                      <td class="col-supplier"><input value="Firma B" /></td>
-                      <td class="col-price" style="color:var(--green)"><input value="3 800" style="text-align:right;color:var(--green)" /></td>
-                      <td class="col-final"><select class="input" style="padding:3px 6px;font-size:11px"><option>Firma B</option><option>Firma A</option></select></td>
-                      <td class="col-price supplier-best">3 800</td>
-                      <td class="col-price supplier-best">7 600</td>
-                    </tr>
-                    <tr>
-                      <td><input value="Obróbka CNC" /></td>
-                      <td><input value="DET-002" /></td>
-                      <td><input value="Wał napędowy" /></td>
-                      <td><input value="5" style="width:40px;text-align:right" /></td>
-                      <td class="col-supplier"><input value="Dostawca CNC" /></td>
-                      <td class="col-price" style="color:var(--green)"><input value="1 200" style="text-align:right;color:var(--green)" /></td>
-                      <td class="col-supplier"><input value="Dostawca Metal" /></td>
-                      <td class="col-price" style="color:var(--red)"><input value="1 450" style="text-align:right;color:var(--red)" /></td>
-                      <td class="col-final"><select class="input" style="padding:3px 6px;font-size:11px"><option>Dostawca CNC</option><option>Dostawca Metal</option></select></td>
-                      <td class="col-price supplier-best">1 200</td>
-                      <td class="col-price supplier-best">6 000</td>
-                    </tr>
-                    <tr>
-                      <td><input value="Malowanie" /></td>
-                      <td><input value="DET-001,002" /></td>
-                      <td><input value="Zabezpieczenie antykorozyjne" /></td>
-                      <td><input value="1" style="width:40px;text-align:right" /></td>
-                      <td class="col-supplier"><input value="Dostawca Lakiernia" /></td>
-                      <td class="col-price" style="color:var(--green)"><input value="2 900" style="text-align:right;color:var(--green)" /></td>
-                      <td class="col-supplier"><input value="" /></td>
-                      <td class="col-price"><input value="—" style="text-align:right;color:var(--text3)" /></td>
-                      <td class="col-final"><select class="input" style="padding:3px 6px;font-size:11px"><option>Dostawca Lakiernia</option></select></td>
-                      <td class="col-price supplier-best">2 900</td>
-                      <td class="col-price supplier-best">2 900</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div class="add-row-btn">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
-                  Dodaj pozycję
-                </div>
-                <div class="summary-row">
-                  <div class="summary-item">
-                    <div class="summary-label">Koszt</div>
-                    <div class="summary-value" id="summary-cost">16 500 PLN</div>
-                  </div>
-                  <div class="summary-item">
-                    <div class="summary-label" id="summary-margin-label">Marża 20%</div>
-                    <div class="summary-value green" id="summary-profit">3 300 PLN</div>
-                  </div>
-                  <div class="summary-item">
-                    <div class="summary-label">Cena ofertowa</div>
-                    <div class="summary-value accent" id="summary-offer">19 800 PLN</div>
-                  </div>
+              <div class="summary-row">
+                <div class="summary-item">
+                  <div class="summary-label">Kalkulacja łączna</div>
+                  <div class="summary-value" id="koszt-total">0 PLN</div>
                 </div>
               </div>
             </div>
           </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3)">
+            ℹ️ Szczegółowy kosztorys (Materiały / Normatywa / Produkcja / Procesy specjalne / Kooperacja)
+            wpisujesz w oknie <strong>„Kalkulacja"</strong>. Rozkład na pojedyncze detale z porównaniem dostawców
+            (opcjonalny) — pod ikoną ▶ przy wierszu.
+          </div>
+        </div>
 
-          <!-- RIGHT: PANEL -->
-          <div class="side-panel">
-            <div class="card">
-              <div class="card-header"><span class="card-title">Podsumowanie</span></div>
-              <div class="card-body">
-                <div class="info-row"><span class="info-label">Numer</span><span class="info-value accent">OFERTA2-05-2026</span></div>
-                <div class="info-row"><span class="info-label">Koszt całkowity</span><span class="info-value" id="side-cost">16 500 PLN</span></div>
-                <div class="info-row"><span class="info-label">Marża</span><span class="info-value" id="side-margin">20%</span></div>
-                <div class="info-row"><span class="info-label">Zysk</span><span class="info-value green" id="side-profit">3 300 PLN</span></div>
-                <div class="info-row"><span class="info-label">Cena ofertowa</span><span class="info-value accent" id="side-offer">19 800 PLN</span></div>
-              </div>
+        <!-- TAB 2: MARŻOWANIE -->
+        <div id="tab-marzowanie" class="tab-content" style="display:none">
+          <div class="margin-panel">
+            <div class="margin-panel-top">
+              <span class="section-title" style="margin:0">Marżowanie</span>
+              <span class="lock-badge">🔒 Widoczne tylko dla uprawnionych</span>
             </div>
-            <div class="card">
-              <div class="card-header"><span class="card-title">Folder projektu</span></div>
-              <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
-                <div class="folder-link" onclick="showToast('Otwieranie folderu w Eksploratorze...')">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 3h6l2 3h10a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z"/></svg>
-                  \\serwer\OFERTY\2026\OFERTA2-05-2026
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                  <div class="folder-link" style="font-size:10px" onclick="showToast('Otwieranie podfolderu...')">📁 dok_techniczna</div>
-                  <div class="folder-link" style="font-size:10px" onclick="showToast('Otwieranie podfolderu...')">📁 kooperacja</div>
-                  <div class="folder-link" style="font-size:10px" onclick="showToast('Otwieranie podfolderu...')">📁 korespondencja</div>
-                </div>
-              </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;color:var(--text2)">Ustaw marżę dla wszystkich:</span>
+              <input class="input" id="bulk-margin" value="20" style="width:64px;text-align:right" />
+              <span style="color:var(--text3)">%</span>
+              <button class="btn btn-ghost btn-sm" onclick="applyMarginToAll()">Zastosuj</button>
             </div>
-            <div class="card">
-              <div class="card-header"><span class="card-title">Akcje</span></div>
-              <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
-                <button class="btn btn-success" style="width:100%;justify-content:center" onclick="openModal('modal-offer')">Stwórz ofertę dla klienta</button>
-                <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="goto('order-detail')">Przejdź do zlecenia</button>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Ofertowane pozycje</span>
+              <button class="btn btn-success btn-sm" onclick="openModal('modal-offer')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Generuj ofertę
+              </button>
+            </div>
+            <div class="cost-table-wrap">
+              <table class="cost-table">
+                <thead>
+                  <tr>
+                    <th style="width:40px">Lp.</th>
+                    <th class="col-price" style="width:70px">Ilość</th>
+                    <th>Nazwa produktu</th>
+                    <th class="col-price">Kalkulacja</th>
+                    <th class="col-price" style="width:90px">Marża %</th>
+                    <th class="col-price">Zysk</th>
+                    <th class="col-price">Cena</th>
+                  </tr>
+                </thead>
+                <tbody id="marza-tbody"></tbody>
+              </table>
+              <div class="summary-row">
+                <div class="summary-item">
+                  <div class="summary-label">Kalkulacja</div>
+                  <div class="summary-value" id="mz-cost">0 PLN</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Zysk</div>
+                  <div class="summary-value green" id="mz-profit">0 PLN</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Marża śr.</div>
+                  <div class="summary-value" id="mz-margin">0%</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Razem (cena ofertowa)</div>
+                  <div class="summary-value accent" id="mz-price">0 PLN</div>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: OFFERS LIST -->
+    <div id="screen-offers" class="screen">
+      <div class="topbar">
+        <span class="topbar-title">Oferty</span>
+      </div>
+      <div class="content">
+        <div class="table-wrap" style="overflow-x:auto">
+          <div class="table-header">
+            <span class="table-header-title">Wysłane oferty</span>
+            <input class="search-box" placeholder="Szukaj: klient, nr oferty..." />
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:32px">Lp.</th>
+                <th>Ilość</th>
+                <th>Nr oferty</th>
+                <th>Nr zam. klienta</th>
+                <th>Klient</th>
+                <th>Nazwa przyrządu</th>
+                <th>Koszt wykonania</th>
+                <th>Zysk</th>
+                <th>Marża</th>
+                <th>Negocjacje</th>
+                <th>Cena sprzedaży</th>
+                <th>Wąskie gardło</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="color:var(--text3);font-family:var(--mono);font-size:11px">1</td>
+                <td>5</td>
+                <td class="mono">OFF0002</td>
+                <td class="mono" style="font-size:11px">ZAM/2026/14</td>
+                <td class="bold">Firma Przykładowa A</td>
+                <td>Elementy złączne</td>
+                <td style="font-family:var(--mono);font-size:12px">8 200 PLN</td>
+                <td style="font-family:var(--mono);font-size:12px;color:var(--green)">1 640 PLN</td>
+                <td style="font-family:var(--mono);font-size:12px">20%</td>
+                <td><select class="input" style="padding:4px 6px;font-size:12px;width:130px" onchange="changeNegotiation(this)">
+                  <option value="wysłana">wysłana</option>
+                  <option value="zaakceptowana">zaakceptowana</option>
+                  <option value="odrzucona">odrzucona</option>
+                  <option value="wstrzymana">wstrzymana</option>
+                </select></td>
+                <td class="bold" style="font-family:var(--mono);color:var(--accent)">9 840 PLN</td>
+                <td><input class="input" style="width:140px;padding:4px 8px;font-size:12px" value="Czeka na decyzję klienta" onblur="showToast('Zapisano: Wąskie gardło')" /></td>
+              </tr>
+              <tr>
+                <td style="color:var(--text3);font-family:var(--mono);font-size:11px">2</td>
+                <td>3</td>
+                <td class="mono">OFF0003</td>
+                <td class="mono" style="font-size:11px">—</td>
+                <td class="bold">Firma Przykładowa B</td>
+                <td>Konstrukcja hali magazynowej</td>
+                <td style="font-family:var(--mono);font-size:12px">51 000 PLN</td>
+                <td style="font-family:var(--mono);font-size:12px;color:var(--green)">10 200 PLN</td>
+                <td style="font-family:var(--mono);font-size:12px">20%</td>
+                <td><select class="input" style="padding:4px 6px;font-size:12px;width:130px" onchange="changeNegotiation(this)">
+                  <option value="wysłana">wysłana</option>
+                  <option value="zaakceptowana" selected>zaakceptowana</option>
+                  <option value="odrzucona">odrzucona</option>
+                  <option value="wstrzymana">wstrzymana</option>
+                </select></td>
+                <td class="bold" style="font-family:var(--mono);color:var(--accent)">61 200 PLN</td>
+                <td><input class="input" style="width:140px;padding:4px 8px;font-size:12px" value="—" onblur="showToast('Zapisano: Wąskie gardło')" /></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -711,6 +790,189 @@
                 <div class="step-sign">Podpis: ___________</div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ SCREEN: CRM -->
+    <div id="screen-crm" class="screen">
+      <div class="topbar">
+        <span class="topbar-title">CRM — dziennik aktywności handlowych</span>
+      </div>
+      <div class="content">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'crm-tab-log')">Odbyte spotkania</div>
+          <div class="tab" onclick="switchTab(this,'crm-tab-plan')">Zaplanowane spotkania</div>
+          <div class="tab" onclick="switchTab(this,'crm-tab-stats')">Statystyka</div>
+        </div>
+
+        <!-- TAB 1: ODBYTE SPOTKANIA (ContactLog) -->
+        <div id="crm-tab-log" class="tab-content">
+          <div class="table-wrap" style="overflow-x:auto">
+            <div class="table-header">
+              <span class="table-header-title">Odbyte spotkania / rozmowy</span>
+              <input class="search-box" placeholder="Szukaj: klient, handlowiec..." />
+              <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openModal('modal-contact-log')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M12 5v14M5 12h14"/></svg>
+                Dodaj wpis
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:32px">Lp.</th>
+                  <th>Klient</th>
+                  <th>Data kontaktu</th>
+                  <th>Rodzaj kontaktu</th>
+                  <th>Opis przebiegu rozmowy</th>
+                  <th>Osoba kontaktowa</th>
+                  <th>Przedstawiciel handlowy</th>
+                </tr>
+              </thead>
+              <tbody id="crm-log-tbody">
+                <tr>
+                  <td style="color:var(--text3);font-family:var(--mono);font-size:11px">1</td>
+                  <td class="bold">Klient Przykładowy sp. z o.o.</td>
+                  <td style="font-family:var(--mono);font-size:12px">2026-06-10</td>
+                  <td><span class="chip">Spotkanie</span></td>
+                  <td style="color:var(--text3);font-size:12px">Prezentacja oferty na ramy nośne, klient zainteresowany większym wolumenem</td>
+                  <td>Jan Wiśniewski</td>
+                  <td>Anna Kowalska</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text3);font-family:var(--mono);font-size:11px">2</td>
+                  <td class="bold">Firma Przykładowa A</td>
+                  <td style="font-family:var(--mono);font-size:12px">2026-06-08</td>
+                  <td><span class="chip">Telefon</span></td>
+                  <td style="color:var(--text3);font-size:12px">Ustalenie szczegółów dostawy elementów złącznych</td>
+                  <td>Maria Lewandowska</td>
+                  <td>Piotr Nowak</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text3);font-family:var(--mono);font-size:11px">3</td>
+                  <td class="bold">Firma Przykładowa B</td>
+                  <td style="font-family:var(--mono);font-size:12px">2026-06-03</td>
+                  <td><span class="chip">E-mail</span></td>
+                  <td style="color:var(--text3);font-size:12px">Przesłanie dokumentacji technicznej konstrukcji hali</td>
+                  <td>Tomasz Zieliński</td>
+                  <td>Piotr Drzazga</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: ZAPLANOWANE SPOTKANIA (PlannedContact) -->
+        <div id="crm-tab-plan" class="tab-content" style="display:none">
+          <div class="table-wrap" style="overflow-x:auto">
+            <div class="table-header">
+              <span class="table-header-title">Lista zadań handlowca — zaplanowane kontakty</span>
+              <input class="search-box" placeholder="Szukaj..." />
+              <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openModal('modal-planned')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M12 5v14M5 12h14"/></svg>
+                Zaplanuj kontakt
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:32px">Lp.</th>
+                  <th>Klient</th>
+                  <th>Data kontaktu</th>
+                  <th>Rodzaj kontaktu</th>
+                  <th>Osoba kontaktowa</th>
+                  <th>Uwagi</th>
+                  <th>Przedstawiciel handlowy</th>
+                </tr>
+              </thead>
+              <tbody id="crm-plan-tbody">
+                <tr>
+                  <td style="color:var(--text3);font-family:var(--mono);font-size:11px">1</td>
+                  <td class="bold">Klient Przykładowy sp. z o.o.</td>
+                  <td style="color:var(--yellow);font-family:var(--mono);font-size:12px">2026-06-18</td>
+                  <td><span class="chip">Spotkanie</span></td>
+                  <td>Jan Wiśniewski</td>
+                  <td style="color:var(--text3);font-size:12px">Domknięcie oferty na ramy nośne</td>
+                  <td>Anna Kowalska</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text3);font-family:var(--mono);font-size:11px">2</td>
+                  <td class="bold">Nowy Klient (potencjalny)</td>
+                  <td style="color:var(--yellow);font-family:var(--mono);font-size:12px">2026-06-22</td>
+                  <td><span class="chip">Telefon</span></td>
+                  <td>—</td>
+                  <td style="color:var(--text3);font-size:12px">Pierwszy kontakt, badanie zapotrzebowania</td>
+                  <td>Piotr Drzazga</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: STATYSTYKA -->
+        <div id="crm-tab-stats" class="tab-content" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+            <div class="card" style="padding:16px 18px">
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Kontakty (czerwiec)</div>
+              <div style="font-size:26px;font-weight:600;font-family:var(--mono);margin-top:6px">12</div>
+            </div>
+            <div class="card" style="padding:16px 18px">
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Zaplanowane</div>
+              <div style="font-size:26px;font-weight:600;font-family:var(--mono);margin-top:6px;color:var(--yellow)">2</div>
+            </div>
+            <div class="card" style="padding:16px 18px">
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Oferty wysłane</div>
+              <div style="font-size:26px;font-weight:600;font-family:var(--mono);margin-top:6px;color:var(--accent)">2</div>
+            </div>
+            <div class="card" style="padding:16px 18px">
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Konwersja ofert</div>
+              <div style="font-size:26px;font-weight:600;font-family:var(--mono);margin-top:6px;color:var(--green)">50%</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-header"><span class="table-header-title">Aktywność per przedstawiciel handlowy</span></div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Przedstawiciel handlowy</th>
+                  <th>Kontakty</th>
+                  <th>Zapytania</th>
+                  <th>Oferty wysłane</th>
+                  <th>Zaakceptowane</th>
+                  <th>Skuteczność</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="bold">Anna Kowalska</td>
+                  <td style="font-family:var(--mono)">6</td>
+                  <td style="font-family:var(--mono)">2</td>
+                  <td style="font-family:var(--mono)">1</td>
+                  <td style="font-family:var(--mono);color:var(--green)">1</td>
+                  <td style="font-family:var(--mono);color:var(--green)">100%</td>
+                </tr>
+                <tr>
+                  <td class="bold">Piotr Nowak</td>
+                  <td style="font-family:var(--mono)">4</td>
+                  <td style="font-family:var(--mono)">1</td>
+                  <td style="font-family:var(--mono)">1</td>
+                  <td style="font-family:var(--mono);color:var(--text3)">0</td>
+                  <td style="font-family:var(--mono);color:var(--yellow)">0%</td>
+                </tr>
+                <tr>
+                  <td class="bold">Piotr Drzazga</td>
+                  <td style="font-family:var(--mono)">2</td>
+                  <td style="font-family:var(--mono)">0</td>
+                  <td style="font-family:var(--mono)">0</td>
+                  <td style="font-family:var(--mono);color:var(--text3)">0</td>
+                  <td style="font-family:var(--mono);color:var(--text3)">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3)">
+            ℹ️ Statystyka agreguje dane z zakładek „Odbyte spotkania", „Zaplanowane spotkania" oraz z zapytań i ofert (widok raportowy — bez własnej tabeli).
           </div>
         </div>
       </div>
@@ -914,8 +1176,23 @@
           </div>
         </div>
         <div class="form-single">
-          <label>Cena łączna (bez VAT)</label>
-          <input class="input" value="19 800 PLN" style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green)" />
+          <label>Przyrządy w ofercie (widoczne dla klienta)</label>
+          <div class="table-wrap" style="overflow:hidden">
+            <table class="cost-table">
+              <thead><tr>
+                <th>Nazwa przyrządu</th>
+                <th style="text-align:center">Ilość</th>
+                <th class="col-price" style="text-align:right">Cena</th>
+              </tr></thead>
+              <tbody id="offer-items-edit"></tbody>
+            </table>
+            <div class="summary-row">
+              <div class="summary-item">
+                <div class="summary-label">Cena łączna (netto)</div>
+                <div class="summary-value accent" id="offer-total-edit">0 PLN</div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="form-single">
           <label>Uwagi / komentarz do oferty (widoczne dla klienta)</label>
@@ -943,10 +1220,18 @@ W przypadku pytań prosimy o kontakt telefoniczny lub mailowy.</textarea>
               <div>NIP: 000-000-00-00</div>
             </div>
           </div>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px">
+            <thead><tr style="border-bottom:2px solid #e2e8f0">
+              <th style="text-align:left;padding:8px 6px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Nazwa przyrządu</th>
+              <th style="text-align:center;padding:8px 6px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Ilość</th>
+              <th style="text-align:right;padding:8px 6px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Cena netto</th>
+            </tr></thead>
+            <tbody id="offer-items-preview"></tbody>
+          </table>
           <div class="offer-total-box">
             <div class="offer-total-label">Łączna cena netto</div>
-            <div class="offer-total-value">19 800 PLN</div>
-            <div style="font-size:11px;color:#aaa;margin-top:6px">+ VAT 23% = 24 354 PLN brutto</div>
+            <div class="offer-total-value" id="offer-preview-total">0 PLN</div>
+            <div style="font-size:11px;color:#aaa;margin-top:6px">+ VAT 23% = <span id="offer-preview-brutto">0 PLN</span> brutto</div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;margin-bottom:16px">
             <div><div style="color:#888;font-size:11px">Oferta ważna do:</div><div style="font-weight:500">2026-06-16</div></div>
@@ -997,6 +1282,123 @@ W przypadku pytań prosimy o kontakt telefoniczny lub mailowy.</div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ MODAL: CRM — ODBYTE SPOTKANIE -->
+<div id="modal-contact-log" class="modal-overlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <span class="modal-title">Nowy wpis — odbyte spotkanie / rozmowa</span>
+      <button class="modal-close" onclick="closeModal('modal-contact-log')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div><label>Klient</label>
+          <select class="input" id="cl-client">
+            <option>Klient Przykładowy sp. z o.o.</option>
+            <option>Firma Przykładowa A</option>
+            <option>Firma Przykładowa B</option>
+          </select>
+        </div>
+        <div><label>Data kontaktu</label><input class="input" type="date" id="cl-date" value="2026-06-15" /></div>
+      </div>
+      <div class="form-row">
+        <div><label>Rodzaj kontaktu</label>
+          <select class="input" id="cl-type"><option>Spotkanie</option><option>Telefon</option><option>E-mail</option></select>
+        </div>
+        <div><label>Osoba kontaktowa</label><input class="input" id="cl-person" placeholder="np. Jan Wiśniewski" /></div>
+      </div>
+      <div class="form-single"><label>Opis przebiegu rozmowy</label><textarea class="input" id="cl-desc" rows="3" placeholder="Przebieg spotkania, ustalenia, dalsze kroki..."></textarea></div>
+      <div class="form-single" style="margin-bottom:0"><label>Przedstawiciel handlowy</label><input class="input" id="cl-rep" value="Anna Kowalska" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-contact-log')">Anuluj</button>
+      <button class="btn btn-primary" onclick="addContactLog()">Zapisz wpis</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MODAL: CRM — ZAPLANOWANY KONTAKT -->
+<div id="modal-planned" class="modal-overlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <span class="modal-title">Zaplanuj kontakt</span>
+      <button class="modal-close" onclick="closeModal('modal-planned')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div><label>Klient</label>
+          <select class="input" id="pl-client">
+            <option>Klient Przykładowy sp. z o.o.</option>
+            <option>Firma Przykładowa A</option>
+            <option>Firma Przykładowa B</option>
+            <option>Nowy Klient (potencjalny)</option>
+          </select>
+        </div>
+        <div><label>Data kontaktu</label><input class="input" type="date" id="pl-date" value="2026-06-20" /></div>
+      </div>
+      <div class="form-row">
+        <div><label>Rodzaj kontaktu</label>
+          <select class="input" id="pl-type"><option>Spotkanie</option><option>Telefon</option><option>E-mail</option></select>
+        </div>
+        <div><label>Osoba kontaktowa</label><input class="input" id="pl-person" placeholder="opcjonalnie" /></div>
+      </div>
+      <div class="form-single"><label>Uwagi</label><textarea class="input" id="pl-notes" rows="3" placeholder="Cel kontaktu, czego dotyczy..."></textarea></div>
+      <div class="form-single" style="margin-bottom:0"><label>Przedstawiciel handlowy</label><input class="input" id="pl-rep" value="Anna Kowalska" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-planned')">Anuluj</button>
+      <button class="btn btn-primary" onclick="addPlanned()">Zaplanuj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MODAL: KALKULACJA (koszty przyrządu) -->
+<div id="modal-calc" class="modal-overlay">
+  <div class="modal" style="width:440px">
+    <div class="modal-header">
+      <span class="modal-title">Kalkulacja kosztu — <span id="calc-name" style="color:var(--accent)">przyrząd</span></span>
+      <button class="modal-close" onclick="closeModal('modal-calc')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">
+        Wpisz koszty dla całego przyrządu. Suma trafi do kolumny „Kalkulacja".
+      </div>
+      <div class="form-single"><label>Materiały (PLN)</label><input class="input calc-field" id="calc-mat" value="0" oninput="updateCalcSum()" /></div>
+      <div class="form-single"><label>Normatywa (PLN)</label><input class="input calc-field" id="calc-norm" value="0" oninput="updateCalcSum()" /></div>
+      <div class="form-single"><label>Produkcja (PLN)</label><input class="input calc-field" id="calc-prod" value="0" oninput="updateCalcSum()" /></div>
+      <div class="form-single"><label>Procesy specjalne (PLN)</label><input class="input calc-field" id="calc-spec" value="0" oninput="updateCalcSum()" /></div>
+      <div class="form-single"><label>Kooperacja (PLN)</label><input class="input calc-field" id="calc-coop" value="0" oninput="updateCalcSum()" /></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface2);border-radius:6px;margin-top:4px">
+        <span style="font-size:13px;color:var(--text2)">Suma (Kalkulacja)</span>
+        <span style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--accent)" id="calc-sum">0 PLN</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-calc')">Anuluj</button>
+      <button class="btn btn-primary" onclick="saveCalc()">Zatwierdź kalkulację</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MODAL: REJECTION REASON -->
+<div id="modal-rejection" class="modal-overlay">
+  <div class="modal" style="width:460px">
+    <div class="modal-header">
+      <span class="modal-title">Powód odrzucenia oferty</span>
+      <button class="modal-close" onclick="closeModal('modal-rejection')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-single" style="margin-bottom:0">
+        <label>Komentarz (dlaczego oferta nie przeszła)</label>
+        <textarea class="input" rows="4" placeholder="np. Cena wyższa od konkurencji, zbyt długi termin realizacji..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-rejection')">Anuluj</button>
+      <button class="btn btn-primary" onclick="saveRejection()">Zapisz</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast" class="toast">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -1004,34 +1406,202 @@ W przypadku pytań prosimy o kontakt telefoniczny lub mailowy.</div>
 </div>
 
 <script>
-const BASE_COST = 16500;
-
 function fmt(n) {
-  return n.toLocaleString('pl-PL') + ' PLN';
+  return Math.round(n).toLocaleString('pl-PL') + ' PLN';
 }
 
-function recalc() {
-  const margin = parseFloat(document.getElementById('margin-input')?.value) || 0;
-  const profit = Math.round(BASE_COST * margin / 100);
-  const offer  = BASE_COST + profit;
+function parseNum(s) {
+  return parseFloat(String(s).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+}
 
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+// ── Wspólne źródło danych: Przyrządy (AssemblyItem) ──
+// Koszty (Materiały/Normatywa/Produkcja/Procesy specjalne/Kooperacja) wpisywane
+// w oknie „Kalkulacja"; w głównym kosztorysie widać tylko ich sumę.
+let assemblies = [
+  { name: 'Stół inspekcyjny', qty: 1, mat: 1200, norm: 400, prod: 1500, spec: 0,   coop: 400, margin: 20, open: false },
+  { name: 'Stół zwykły',      qty: 2, mat: 800,  norm: 200, prod: 900,  spec: 0,   coop: 0,   margin: 20, open: false },
+  { name: 'Rama nośna',       qty: 1, mat: 2000, norm: 500, prod: 2500, spec: 800, coop: 0,   margin: 15, open: false },
+];
+let calcIndex = null;
 
-  set('summary-cost',         fmt(BASE_COST));
-  set('summary-margin-label', `Marża ${margin}%`);
-  set('summary-profit',       fmt(profit));
-  set('summary-offer',        fmt(offer));
-  set('side-cost',            fmt(BASE_COST));
-  set('side-margin',          margin + '%');
-  set('side-profit',          fmt(profit));
-  set('side-offer',           fmt(offer));
+const asmCost   = a => a.mat + a.norm + a.prod + a.spec + a.coop;
+const asmProfit = a => Math.round(asmCost(a) * a.margin / 100);
+const asmPrice  = a => asmCost(a) + asmProfit(a);
+
+function renderAll() { renderKosztorys(); renderMarzowanie(); updateTotals(); }
+
+// ZAKŁADKA 1 — Kosztorys: prosta tabela Lp | Ilość | Nazwa | Kalkulacja + przycisk Kalkulacja
+function renderKosztorys() {
+  const tb = document.getElementById('kosztorys-tbody');
+  if (!tb) return;
+  let html = '';
+  assemblies.forEach((a, i) => {
+    html += `<tr class="asm-row">
+      <td><button class="det-toggle ${a.open ? 'open' : ''}" onclick="toggleDetails(${i})">${a.open ? '▼' : '▶'}</button></td>
+      <td style="color:var(--text3);font-family:var(--mono);font-size:11px">${i + 1}</td>
+      <td><input value="${a.qty}" style="width:50px;text-align:right" onchange="updateField(${i},'qty',this.value)" /></td>
+      <td class="asm-name-cell"><input class="asm-name" value="${a.name}" onchange="updateField(${i},'name',this.value)" /></td>
+      <td class="calc-cell calc-cost">${fmt(asmCost(a))}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openCalc(${i})">⚙ Kalkulacja</button></td>
+    </tr>`;
+    html += `<tr class="detail-row" style="${a.open ? '' : 'display:none'}"><td colspan="6">${a.open ? buildDetailTable() : ''}</td></tr>`;
+  });
+  tb.innerHTML = html;
+}
+
+// ZAKŁADKA 2 — Marżowanie: Lp | Ilość | Nazwa | Kalkulacja | Marża | Zysk | Cena
+function renderMarzowanie() {
+  const tb = document.getElementById('marza-tbody');
+  if (!tb) return;
+  let html = '';
+  assemblies.forEach((a, i) => {
+    html += `<tr>
+      <td style="color:var(--text3);font-family:var(--mono);font-size:11px">${i + 1}</td>
+      <td style="text-align:right">${a.qty}</td>
+      <td class="bold" style="color:var(--text)">${a.name}</td>
+      <td class="calc-cell calc-cost">${fmt(asmCost(a))}</td>
+      <td><input class="asm-margin" value="${a.margin}" onchange="updateField(${i},'margin',this.value)" /></td>
+      <td class="calc-cell calc-profit">${fmt(asmProfit(a))}</td>
+      <td class="calc-cell calc-price">${fmt(asmPrice(a))}</td>
+    </tr>`;
+  });
+  tb.innerHTML = html;
+}
+
+function updateTotals() {
+  let tCost = 0, tProfit = 0, tPrice = 0;
+  assemblies.forEach(a => { tCost += asmCost(a); tProfit += asmProfit(a); tPrice += asmPrice(a); });
+  const avg = tCost ? Math.round(tProfit / tCost * 100) : 0;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('koszt-total', fmt(tCost));
+  set('mz-cost', fmt(tCost));
+  set('mz-profit', fmt(tProfit));
+  set('mz-margin', avg + '%');
+  set('mz-price', fmt(tPrice));
+}
+
+function updateField(i, field, val) {
+  const a = assemblies[i];
+  if (field === 'name') a.name = val;
+  else if (field === 'qty') a.qty = parseNum(val);
+  else if (field === 'margin') a.margin = parseNum(val);
+  renderMarzowanie();
+  updateTotals();
+}
+
+function applyMarginToAll() {
+  const m = parseNum(document.getElementById('bulk-margin').value);
+  assemblies.forEach(a => a.margin = m);
+  renderAll();
+  showToast('Marża ' + m + '% zastosowana do wszystkich przyrządów');
+}
+
+function addAssemblyRow() {
+  assemblies.push({ name: 'Nowy przyrząd', qty: 1, mat: 0, norm: 0, prod: 0, spec: 0, coop: 0, margin: 20, open: false });
+  renderAll();
+}
+
+// ── Okno „Kalkulacja" — 5 składników kosztu przyrządu (Rozwiązanie nr 1 z pptx) ──
+function openCalc(i) {
+  calcIndex = i;
+  const a = assemblies[i];
+  document.getElementById('calc-name').textContent = a.name;
+  document.getElementById('calc-mat').value  = a.mat;
+  document.getElementById('calc-norm').value = a.norm;
+  document.getElementById('calc-prod').value = a.prod;
+  document.getElementById('calc-spec').value = a.spec;
+  document.getElementById('calc-coop').value = a.coop;
+  updateCalcSum();
+  openModal('modal-calc');
+}
+
+function updateCalcSum() {
+  const s = ['calc-mat', 'calc-norm', 'calc-prod', 'calc-spec', 'calc-coop']
+    .reduce((t, id) => t + parseNum(document.getElementById(id).value), 0);
+  document.getElementById('calc-sum').textContent = fmt(s);
+}
+
+function saveCalc() {
+  if (calcIndex === null) return;
+  const a = assemblies[calcIndex];
+  a.mat  = parseNum(document.getElementById('calc-mat').value);
+  a.norm = parseNum(document.getElementById('calc-norm').value);
+  a.prod = parseNum(document.getElementById('calc-prod').value);
+  a.spec = parseNum(document.getElementById('calc-spec').value);
+  a.coop = parseNum(document.getElementById('calc-coop').value);
+  closeModal('modal-calc');
+  renderAll();
+  showToast('Kalkulacja zapisana: ' + fmt(asmCost(a)));
+}
+
+// ── Opcjonalny rozkład na Detale (Zakładka 1A / DetailItem) ──
+function toggleDetails(i) {
+  assemblies[i].open = !assemblies[i].open;
+  renderKosztorys();
+}
+
+function detailRowHTML(p, n, o, q, mt, mk, dim, d1, c1, d2, c2, fin) {
+  p = p || ''; n = n || ''; o = o || ''; q = q || '1';
+  mt = mt || ''; mk = mk || ''; dim = dim || '';
+  d1 = d1 || ''; c1 = c1 || 0; d2 = d2 || ''; c2 = c2 || 0; fin = fin || d1;
+  const unit = Math.min(c1 || Infinity, c2 || Infinity);
+  const unitV = isFinite(unit) ? unit : 0;
+  return `
+    <td><input value="${p}" /></td>
+    <td><input value="${n}" /></td>
+    <td><input value="${o}" /></td>
+    <td><input value="${q}" style="width:40px" /></td>
+    <td><input value="${mt}" /></td>
+    <td><input value="${mk}" /></td>
+    <td><input value="${dim}" style="min-width:110px" /></td>
+    <td class="col-supplier"><input value="${d1}" /></td>
+    <td class="col-price"><input value="${c1 ? c1.toLocaleString('pl-PL') : ''}" style="text-align:right" /></td>
+    <td class="col-supplier"><input value="${d2}" /></td>
+    <td class="col-price"><input value="${c2 ? c2.toLocaleString('pl-PL') : ''}" style="text-align:right" /></td>
+    <td class="col-final"><input value="${fin}" /></td>
+    <td class="col-price supplier-best">${unitV.toLocaleString('pl-PL')}</td>
+    <td class="col-price supplier-best">${(unitV * parseNum(q)).toLocaleString('pl-PL')}</td>`;
+}
+
+function buildDetailTable() {
+  return `<div class="detail-sub">
+    <div class="detail-sub-title">Rozkład na detale (opcjonalny — porównanie dostawców)</div>
+    <div style="overflow-x:auto">
+    <table class="cost-table">
+      <thead><tr>
+        <th>Proces</th><th>Nr detalu</th><th>Opis</th><th>Ilość</th>
+        <th>Materiał (typ)</th><th>Materiał (rodzaj)</th><th>Wymiary D×S×W×G</th>
+        <th class="col-supplier">Dostawca 1</th><th class="col-price">Cena 1</th>
+        <th class="col-supplier">Dostawca 2</th><th class="col-price">Cena 2</th>
+        <th class="col-final">Finalny dostawca</th><th class="col-price">Cena szt.</th><th class="col-price">Razem</th>
+      </tr></thead>
+      <tbody>
+        <tr>${detailRowHTML('Spawanie', 'DET-001', 'Rama główna', '2', 'Stal', 'S355', '2000×800×40×8', 'Firma Przykładowa A', 4200, 'Firma Przykładowa B', 3800)}</tr>
+        <tr>${detailRowHTML('Obróbka CNC', 'DET-002', 'Wspornik', '4', 'Stal', 'S235', '300×120×20×6', 'Dostawca CNC', 1200, 'Dostawca Metal', 1450)}</tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="add-row-btn" onclick="addDetailRow(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
+      Dodaj detal
+    </div>
+  </div>`;
+}
+
+function addDetailRow(btn) {
+  const tbody = btn.closest('.detail-sub').querySelector('tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = detailRowHTML('', '', '', '1');
+  tbody.appendChild(tr);
 }
 
 const screens = {
   'inquiries': 'screen-inquiries',
   'inquiry-detail': 'screen-inquiry-detail',
+  'offers': 'screen-offers',
   'orders': 'screen-orders',
   'order-detail': 'screen-order-detail',
+  'crm': 'screen-crm',
   'clients': 'screen-clients',
   'contractors': 'screen-contractors',
   'guides-tpl': 'screen-guides-tpl',
@@ -1039,10 +1609,12 @@ const screens = {
 
 const navMap = {
   'inquiries': 0, 'inquiry-detail': 0,
-  'orders': 1,    'order-detail': 1,
-  'clients': 2,
-  'contractors': 3,
-  'guides-tpl': 4,
+  'offers': 1,
+  'orders': 2,    'order-detail': 2,
+  'crm': 3,
+  'clients': 4,
+  'contractors': 5,
+  'guides-tpl': 6,
 };
 
 function goto(screen) {
@@ -1056,6 +1628,28 @@ function goto(screen) {
 
 function openModal(id) {
   document.getElementById(id).classList.add('open');
+  if (id === 'modal-offer') populateOffer();
+}
+
+// ── Oferta dla klienta: lista przyrządów (tylko nazwa/ilość/cena) ──
+function offerData() {
+  const items = assemblies.map(a => ({ name: a.name, q: a.qty, price: asmPrice(a) }));
+  const total = items.reduce((t, it) => t + it.price, 0);
+  return { items, total };
+}
+
+function populateOffer() {
+  const { items, total } = offerData();
+  const editEl = document.getElementById('offer-items-edit');
+  if (editEl) editEl.innerHTML = items.map(it =>
+    `<tr><td>${it.name}</td><td style="text-align:center">${it.q}</td><td class="col-price" style="text-align:right;font-family:var(--mono)">${fmt(it.price)}</td></tr>`).join('');
+  const prevEl = document.getElementById('offer-items-preview');
+  if (prevEl) prevEl.innerHTML = items.map(it =>
+    `<tr style="border-bottom:1px solid #eee"><td style="padding:8px 6px;color:#111">${it.name}</td><td style="padding:8px 6px;text-align:center;color:#444">${it.q}</td><td style="padding:8px 6px;text-align:right;font-weight:500;color:#111">${fmt(it.price)}</td></tr>`).join('');
+  const setT = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setT('offer-total-edit', fmt(total));
+  setT('offer-preview-total', fmt(total));
+  setT('offer-preview-brutto', fmt(Math.round(total * 1.23)));
 }
 
 function closeModal(id) {
@@ -1088,6 +1682,50 @@ function switchToPreview() {
   switchTab(tab, 'offer-tab-preview');
 }
 
+// ── Status negocjacji oferty (Z6) ──
+function changeNegotiation(sel) {
+  if (sel.value === 'odrzucona') {
+    openModal('modal-rejection');
+  } else {
+    showToast('Status zaktualizowany: ' + sel.value);
+  }
+}
+
+function saveRejection() {
+  closeModal('modal-rejection');
+  showToast('Status zaktualizowany');
+}
+
+// ── CRM — dodawanie wpisów (mock: dopisuje wiersz do tabeli) ──
+function crmAppendRow(tbodyId, cells) {
+  const tb = document.getElementById(tbodyId);
+  const tr = document.createElement('tr');
+  cells.forEach((c, idx) => {
+    const td = document.createElement('td');
+    td.textContent = c;
+    if (idx === 0) { td.style.color = 'var(--text3)'; td.style.fontFamily = 'var(--mono)'; td.style.fontSize = '11px'; }
+    if (idx === 1) td.className = 'bold';
+    tr.appendChild(td);
+  });
+  tb.appendChild(tr);
+}
+
+function addContactLog() {
+  const v = id => document.getElementById(id).value;
+  const tb = document.getElementById('crm-log-tbody');
+  crmAppendRow('crm-log-tbody', [tb.children.length + 1, v('cl-client'), v('cl-date'), v('cl-type'), v('cl-desc') || '—', v('cl-person') || '—', v('cl-rep')]);
+  closeModal('modal-contact-log');
+  showToast('Wpis dodany do dziennika kontaktów');
+}
+
+function addPlanned() {
+  const v = id => document.getElementById(id).value;
+  const tb = document.getElementById('crm-plan-tbody');
+  crmAppendRow('crm-plan-tbody', [tb.children.length + 1, v('pl-client'), v('pl-date'), v('pl-type'), v('pl-person') || '—', v('pl-notes') || '—', v('pl-rep')]);
+  closeModal('modal-planned');
+  showToast('Kontakt zaplanowany');
+}
+
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1107,6 +1745,9 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     if (e.target === overlay) overlay.classList.remove('open');
   });
 });
+
+// Inicjalne wyrenderowanie kosztorysu i marżowania
+renderAll();
 </script>
 </body>
 </html>
